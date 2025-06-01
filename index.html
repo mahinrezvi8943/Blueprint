@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Blueprint: Section Group Creation App</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Visualization & Content Choices: 
+        - Report Info: System Architecture -> Goal: Inform -> Viz: HTML/CSS Diagram -> Interaction: Static -> Justification: Visually untangles the relationship between frontend, backend, and DB more effectively than text.
+        - Report Info: UI/UX Designs -> Goal: Engage/Inform -> Viz: Tabbed HTML/CSS Mockups -> Interaction: Click tabs/buttons -> Justification: Provides a tangible, visual feel for the proposed application, making the design concrete.
+        - Report Info: Tech Stack -> Goal: Compare/Inform -> Viz: Chart.js Doughnut Chart -> Interaction: Hover for tooltips -> Justification: Offers a quick, quantitative overview of the technology choices.
+        - Report Info: Database Schema & API Endpoints -> Goal: Organize/Inform -> Viz: HTML Accordion/Card List -> Interaction: Click to expand -> Justification: Prevents information overload by hiding details until requested, promoting focused exploration.
+        - Report Info: Security/Scalability -> Goal: Inform -> Viz: Styled Lists with Unicode Icons -> Interaction: Static -> Justification: Enhances scannability and highlights key best practices effectively.
+    -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #2c3e50;
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            color: #1a7f6e;
+            border-color: #1a7f6e;
+        }
+        .tab-button {
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .tab-button.active {
+            background-color: #1a7f6e;
+            color: white;
+        }
+        .accordion-header {
+            transition: background-color 0.3s ease;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 400px;
+        }
+        .tag {
+            background-color: #e0f2f1;
+            color: #1a7f6e;
+            font-weight: 500;
+        }
+        .tag-put { background-color: #e3f2fd; color: #1e88e5; }
+        .tag-post { background-color: #e8f5e9; color: #43a047; }
+        .tag-get { background-color: #fce4ec; color: #d81b60; }
+        .tag-delete { background-color: #fbe9e7; color: #f4511e; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header id="header" class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl md:text-2xl font-bold text-gray-800">App Blueprint</h1>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#architecture" class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1">Architecture</a>
+                    <a href="#journey" class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1">User Journey</a>
+                    <a href="#tech" class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1">Tech & Data</a>
+                    <a href="#practices" class="nav-link text-gray-600 font-medium border-b-2 border-transparent pb-1">Best Practices</a>
+                </nav>
+                <button id="mobile-menu-button" class="md:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100">
+                    <span class="sr-only">Open menu</span>
+                    <div class="w-6 h-0.5 bg-gray-600 mb-1.5"></div>
+                    <div class="w-6 h-0.5 bg-gray-600"></div>
+                </button>
+            </div>
+        </div>
+        <div id="mobile-menu" class="md:hidden hidden px-4 pt-2 pb-4 space-y-2 bg-white">
+            <a href="#architecture" class="block nav-link text-gray-600 font-medium rounded-md py-2">Architecture</a>
+            <a href="#journey" class="block nav-link text-gray-600 font-medium rounded-md py-2">User Journey</a>
+            <a href="#tech" class="block nav-link text-gray-600 font-medium rounded-md py-2">Tech & Data</a>
+            <a href="#practices" class="block nav-link text-gray-600 font-medium rounded-md py-2">Best Practices</a>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <section id="architecture" class="mb-24 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-4">High-Level Architecture</h2>
+            <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12">
+                The application is designed with a modern, decoupled architecture. This separates the user interface from the core business logic, allowing for independent development, scaling, and maintenance. Below is a visual representation of how these components interact.
+            </p>
+            <div class="bg-white p-8 rounded-xl shadow-lg">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center text-center">
+                    <div class="flex flex-col items-center">
+                        <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-3">
+                             <span class="text-4xl">🖥️</span>
+                        </div>
+                        <h3 class="text-lg font-semibold">Frontend (SPA)</h3>
+                        <p class="text-sm text-gray-500">React & Material UI</p>
+                    </div>
+
+                    <div class="relative">
+                        <div class="hidden md:block absolute top-1/2 left-0 w-full h-0.5 bg-gray-200"></div>
+                        <div class="hidden md:block absolute top-1/2 -left-2 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-r-8 border-r-gray-200"></div>
+                        <div class="hidden md:block absolute top-1/2 -right-2 w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-l-8 border-l-gray-200"></div>
+                        <p class="font-mono text-sm text-teal-600 bg-teal-50 rounded-full px-4 py-1 inline-block z-10 relative">REST API (JSON)</p>
+                    </div>
+
+                    <div class="flex flex-col items-center">
+                        <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-3">
+                             <span class="text-4xl">⚙️</span>
+                        </div>
+                        <h3 class="text-lg font-semibold">Backend API</h3>
+                        <p class="text-sm text-gray-500">FastAPI (Python)</p>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-8">
+                     <div class="relative w-full max-w-xs text-center">
+                        <div class="hidden md:block absolute bottom-full left-1/2 -translate-x-1/2 w-0.5 h-8 bg-gray-200"></div>
+                        <div class="hidden md:block absolute -bottom-2 left-1/2 -translate-x-1/2 w-0 h-0 border-l-8 border-l-transparent border-r-8 border-r-transparent border-t-8 border-t-gray-200"></div>
+                        <p class="font-mono text-sm text-purple-600 bg-purple-50 rounded-full px-4 py-1 inline-block z-10 relative">SQLAlchemy ORM</p>
+                    </div>
+                </div>
+                <div class="flex justify-center mt-8">
+                    <div class="flex flex-col items-center">
+                        <div class="w-24 h-24 bg-purple-100 rounded-full flex items-center justify-center mb-3">
+                             <span class="text-4xl">🗃️</span>
+                        </div>
+                        <h3 class="text-lg font-semibold">Database</h3>
+                        <p class="text-sm text-gray-500">PostgreSQL</p>
+                    </div>
+                </div>
+                <div class="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-center items-center gap-6">
+                    <h3 class="text-lg font-semibold text-gray-700">Authentication:</h3>
+                    <div class="flex items-center gap-3 bg-yellow-50 text-yellow-800 px-4 py-2 rounded-lg">
+                        <span class="text-2xl">🔑</span>
+                        <div>
+                            <p class="font-semibold">JWT & HttpOnly Cookies</p>
+                            <p class="text-sm text-yellow-700">Secure token-based authentication for all protected endpoints.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="journey" class="mb-24 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-4">The User Journey</h2>
+            <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12">
+                This section provides an interactive preview of the application's key screens as described in the design plan. You can click through the tabs to visualize the intended user flow, from logging in as a Class Representative (CR) to managing communication groups.
+            </p>
+            <div class="bg-white rounded-xl shadow-lg p-2 sm:p-4">
+                <div id="tabs-container" class="flex flex-wrap border-b border-gray-200 mb-4">
+                    <button class="tab-button px-4 py-2 font-medium text-sm sm:text-base rounded-t-lg active" data-tab="login">1. Login Page</button>
+                    <button class="tab-button px-4 py-2 font-medium text-sm sm:text-base rounded-t-lg" data-tab="dashboard">2. Dashboard</button>
+                    <button class="tab-button px-4 py-2 font-medium text-sm sm:text-base rounded-t-lg" data-tab="groups">3. Groups Management</button>
+                </div>
+                <div class="p-2 sm:p-4">
+                    <div id="login-tab" class="tab-content">
+                        <div class="w-full max-w-md mx-auto bg-gray-50 p-8 rounded-lg border border-gray-200">
+                             <h3 class="text-2xl font-semibold text-center mb-1 text-gray-800">CR Portal Login</h3>
+                             <p class="text-center text-gray-500 mb-6">Access the group management dashboard.</p>
+                             <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">CR ID</label>
+                                    <input type="text" placeholder="e.g., cr_john_doe" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                                    <input type="password" placeholder="••••••••" class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-teal-500 focus:border-teal-500">
+                                </div>
+                                <button class="w-full bg-teal-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-teal-700 transition-colors">Login</button>
+                             </div>
+                        </div>
+                    </div>
+                    <div id="dashboard-tab" class="tab-content hidden">
+                         <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <h3 class="text-2xl font-bold mb-4 text-gray-800">Dashboard</h3>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                                <div class="bg-white p-4 rounded-lg shadow"><p class="text-sm text-gray-500">Total Groups</p><p class="text-2xl font-bold">42</p></div>
+                                <div class="bg-white p-4 rounded-lg shadow"><p class="text-sm text-gray-500">Platforms</p><p class="text-2xl font-bold">3</p></div>
+                                <div class="bg-white p-4 rounded-lg shadow"><p class="text-sm text-gray-500">Managed Semesters</p><p class="text-2xl font-bold">5</p></div>
+                                <div class="bg-white p-4 rounded-lg shadow"><p class="text-sm text-gray-500">Most Active</p><p class="text-2xl font-bold">Fall 2024</p></div>
+                            </div>
+                            <h4 class="text-xl font-semibold mb-3 text-gray-700">Section Records</h4>
+                            <div class="space-y-3">
+                                <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center">
+                                    <div>
+                                        <p class="font-semibold">Section A - Computer Science</p>
+                                        <p class="text-sm text-gray-500">Fall 2024</p>
+                                    </div>
+                                    <span class="text-sm font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full">5 Groups</span>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg shadow-sm flex justify-between items-center">
+                                    <div>
+                                        <p class="font-semibold">Section B - Electrical Engineering</p>
+                                        <p class="text-sm text-gray-500">Fall 2024</p>
+                                    </div>
+                                    <span class="text-sm font-medium bg-blue-100 text-blue-800 px-2 py-1 rounded-full">3 Groups</span>
+                                </div>
+                            </div>
+                         </div>
+                    </div>
+                    <div id="groups-tab" class="tab-content hidden">
+                        <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <div class="flex flex-wrap justify-between items-center mb-4 gap-4">
+                                <h3 class="text-2xl font-bold text-gray-800">Manage Groups</h3>
+                                <button class="bg-teal-600 text-white font-semibold py-2 px-4 rounded-md hover:bg-teal-700 transition-colors flex items-center gap-2">
+                                    <span>✚</span> Create Group
+                                </button>
+                            </div>
+                            <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
+                                <div class="flex border border-gray-300 rounded-md">
+                                    <button class="px-3 py-1 bg-white text-gray-700 border-r border-gray-300">Messenger</button>
+                                    <button class="px-3 py-1 bg-teal-600 text-white">Telegram</button>
+                                    <button class="px-3 py-1 bg-white text-gray-700 border-l border-gray-300">WhatsApp</button>
+                                </div>
+                                <div class="flex gap-2">
+                                    <input type="search" placeholder="Search groups..." class="px-3 py-1 border border-gray-300 rounded-md shadow-sm w-40">
+                                    <select class="px-3 py-1 border border-gray-300 rounded-md shadow-sm">
+                                        <option>Sort by Semester</option>
+                                        <option>Fall 2024</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="bg-white p-4 rounded-lg shadow-sm grid grid-cols-3 gap-4 items-center">
+                                    <p class="font-semibold col-span-3 sm:col-span-1">CS-101 Announcements</p>
+                                    <a href="#" class="text-teal-600 hover:underline text-sm truncate col-span-3 sm:col-span-1">t.me/cs101_fall24</a>
+                                    <div class="flex items-center justify-end gap-2 col-span-3 sm:col-span-1">
+                                        <span class="text-xs font-medium bg-gray-100 text-gray-800 px-2 py-1 rounded-full">Fall 2024</span>
+                                        <button class="text-gray-500 hover:text-blue-600 p-1">✏️</button>
+                                        <button class="text-gray-500 hover:text-red-600 p-1">🗑️</button>
+                                    </div>
+                                </div>
+                                 <div class="bg-white p-4 rounded-lg shadow-sm grid grid-cols-3 gap-4 items-center">
+                                    <p class="font-semibold col-span-3 sm:col-span-1">Final Year Project Help</p>
+                                    <a href="#" class="text-teal-600 hover:underline text-sm truncate col-span-3 sm:col-span-1">t.me/fyp_help_2024</a>
+                                    <div class="flex items-center justify-end gap-2 col-span-3 sm:col-span-1">
+                                        <span class="text-xs font-medium bg-gray-100 text-gray-800 px-2 py-1 rounded-full">Fall 2024</span>
+                                        <button class="text-gray-500 hover:text-blue-600 p-1">✏️</button>
+                                        <button class="text-gray-500 hover:text-red-600 p-1">🗑️</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="tech" class="mb-24 scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-4">Technology & Data Model</h2>
+            <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12">
+                The application is built on a robust and scalable technology stack. The data model is structured relationally to ensure integrity, while the API provides clear endpoints for the frontend to consume. Explore the components below.
+            </p>
+            <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 text-center">Core Technology Stack</h3>
+                    <div class="chart-container">
+                        <canvas id="techStackChart"></canvas>
+                    </div>
+                </div>
+                <div class="lg:col-span-3 bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4">Database Schema</h3>
+                    <div class="space-y-4">
+                        <div class="border border-gray-200 rounded-lg">
+                            <div class="bg-gray-50 p-3 font-semibold flex items-center gap-2">📇 Users (CRs)</div>
+                            <ul class="p-4 text-sm space-y-1">
+                                <li><span class="font-mono text-purple-700">id</span>: UUID</li>
+                                <li><span class="font-mono text-purple-700">cr_id</span>: VARCHAR (Unique)</li>
+                                <li><span class="font-mono text-purple-700">hashed_password</span>: VARCHAR</li>
+                            </ul>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg">
+                            <div class="bg-gray-50 p-3 font-semibold flex items-center gap-2">🗓️ Semesters</div>
+                            <ul class="p-4 text-sm space-y-1">
+                                <li><span class="font-mono text-purple-700">id</span>: SERIAL</li>
+                                <li><span class="font-mono text-purple-700">name</span>: VARCHAR (Unique)</li>
+                            </ul>
+                        </div>
+                        <div class="border border-gray-200 rounded-lg">
+                            <div class="bg-gray-50 p-3 font-semibold flex items-center gap-2">💬 Communication Groups</div>
+                             <ul class="p-4 text-sm space-y-1">
+                                <li><span class="font-mono text-purple-700">id</span>: UUID</li>
+                                <li><span class="font-mono text-purple-700">name</span>: VARCHAR</li>
+                                <li><span class="font-mono text-purple-700">link</span>: VARCHAR</li>
+                                <li><span class="font-mono text-purple-700">platform</span>: VARCHAR</li>
+                                <li><span class="font-mono text-purple-700">semester_id</span>: FK -> semesters.id</li>
+                                <li><span class="font-mono text-purple-700">created_by_user_id</span>: FK -> users.id</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 bg-white p-6 rounded-xl shadow-lg">
+                 <h3 class="text-xl font-semibold mb-4">API Endpoints</h3>
+                 <div id="accordion-container" class="space-y-2">
+                    <div class="accordion-item border-b border-gray-200">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left">
+                            <div class="flex items-center gap-4">
+                                <span class="tag tag-post font-mono text-sm px-2 py-1 rounded">POST</span>
+                                <span class="font-semibold text-gray-800">/auth/login</span>
+                            </div>
+                            <span class="accordion-icon text-2xl text-gray-400">▸</span>
+                        </button>
+                        <div class="accordion-content px-4 pb-4">
+                            <p class="text-gray-600">Authenticates a CR and returns access/refresh tokens.</p>
+                        </div>
+                    </div>
+                     <div class="accordion-item border-b border-gray-200">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left">
+                            <div class="flex items-center gap-4">
+                                <span class="tag tag-post font-mono text-sm px-2 py-1 rounded">POST</span>
+                                <span class="font-semibold text-gray-800">/groups/</span>
+                            </div>
+                            <span class="accordion-icon text-2xl text-gray-400">▸</span>
+                        </button>
+                        <div class="accordion-content px-4 pb-4">
+                            <p class="text-gray-600 mb-2">Creates a new communication group. Requires authentication.</p>
+                            <p class="text-sm"><span class="font-semibold">Body:</span> GroupCreate Schema (name, link, semester_id, platform)</p>
+                        </div>
+                    </div>
+                    <div class="accordion-item border-b border-gray-200">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left">
+                            <div class="flex items-center gap-4">
+                                <span class="tag tag-get font-mono text-sm px-2 py-1 rounded">GET</span>
+                                <span class="font-semibold text-gray-800">/groups/{platform}</span>
+                            </div>
+                           <span class="accordion-icon text-2xl text-gray-400">▸</span>
+                        </button>
+                         <div class="accordion-content px-4 pb-4">
+                            <p class="text-gray-600 mb-2">Lists groups for a specific platform. Supports filtering and search. Requires authentication.</p>
+                            <p class="text-sm"><span class="font-semibold">Params:</span> semester_id (optional), search (optional)</p>
+                        </div>
+                    </div>
+                     <div class="accordion-item border-b border-gray-200">
+                        <button class="accordion-header w-full flex justify-between items-center p-4 text-left">
+                           <div class="flex items-center gap-4">
+                                <span class="tag tag-put font-mono text-sm px-2 py-1 rounded">PUT</span>
+                                <span class="font-semibold text-gray-800">/groups/{group_id}</span>
+                            </div>
+                            <span class="accordion-icon text-2xl text-gray-400">▸</span>
+                        </button>
+                         <div class="accordion-content px-4 pb-4">
+                            <p class="text-gray-600">Edits an existing group. Requires authentication and ownership.</p>
+                        </div>
+                    </div>
+                 </div>
+            </div>
+        </section>
+
+        <section id="practices" class="scroll-mt-20">
+            <h2 class="text-3xl font-bold text-center mb-4">Security & Scalability</h2>
+            <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12">
+                The application is designed with robust security measures and scalability in mind from the ground up. This ensures a safe user experience and prepares the system for future growth.
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-semibold mb-4 flex items-center gap-3">🛡️ Security Best Practices</h3>
+                    <ul class="space-y-3 text-gray-700">
+                        <li class="flex gap-3"><span class="text-teal-600">✓</span><div><strong>XSS Prevention:</strong> React's native escaping and a strong Content Security Policy (CSP).</div></li>
+                        <li class="flex gap-3"><span class="text-teal-600">✓</span><div><strong>CSRF Protection:</strong> Use of HttpOnly, SameSite cookies for refresh tokens.</div></li>
+                        <li class="flex gap-3"><span class="text-teal-600">✓</span><div><strong>SQL Injection Prevention:</strong> Handled by SQLAlchemy ORM's parameterized queries.</div></li>
+                        <li class="flex gap-3"><span class="text-teal-600">✓</span><div><strong>Input Validation:</strong> Rigorous server-side validation with Pydantic schemas.</div></li>
+                        <li class="flex gap-3"><span class="text-teal-600">✓</span><div><strong>Password Security:</strong> Strong hashing algorithms (bcrypt) for storing user credentials.</div></li>
+                        <li class="flex gap-3"><span class="text-teal-600">✓</span><div><strong>API Rate Limiting:</strong> Protection against brute-force and denial-of-service attacks.</div></li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                     <h3 class="text-xl font-semibold mb-4 flex items-center gap-3">📈 Scalability Patterns</h3>
+                     <ul class="space-y-3 text-gray-700">
+                        <li class="flex gap-3"><span class="text-teal-600">✓</span><div><strong>Stateless Backend:</strong> Enables horizontal scaling by running multiple API instances.</div></li>
+                        <li class="flex gap-3"><span class="text-teal-600">✓</span><div><strong>Connection Pooling:</strong> Efficiently manages database connections to handle more requests.</div></li>
+                        <li class="flex gap-3"><span class="text-teal-600">✓</span><div><strong>Caching Strategies:</strong> Caching frequent, non-critical data (e.g., semester lists) to reduce DB load.</div></li>
+                        <li class="flex gap-3"><span class="text-teal-600">✓</span><div><strong>API Pagination:</strong> Ensures efficient data handling for large lists of groups or sections.</div></li>
+                        <li class="flex gap-3"><span class="text-teal-600">✓</span><div><strong>Modular Codebase:</strong> Feature-based structure allows for easier maintenance and future migration to microservices if needed.</div></li>
+                     </ul>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    
+    <footer class="bg-gray-800 text-white mt-16">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-sm">
+            <p>&copy; 2025 Interactive Application Blueprint. All rights reserved.</p>
+            <p class="text-gray-400">Generated based on the Section Group Creation App Design Report.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile Menu
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+            
+            // Close mobile menu on link click
+            const mobileNavLinks = mobileMenu.querySelectorAll('a');
+            mobileNavLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // Smooth Scroll & Active Nav Link
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+            
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${current}`) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+
+            // Tabs for User Journey
+            const tabsContainer = document.getElementById('tabs-container');
+            const tabButtons = tabsContainer.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab;
+
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    tabContents.forEach(content => {
+                        if (content.id === `${tabId}-tab`) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            // Accordion for API Endpoints
+            const accordionContainer = document.getElementById('accordion-container');
+            const accordionItems = accordionContainer.querySelectorAll('.accordion-item');
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                const icon = item.querySelector('.accordion-icon');
+                
+                header.addEventListener('click', () => {
+                    const isExpanded = content.style.maxHeight && content.style.maxHeight !== '0px';
+                    
+                    // Close all others
+                    accordionItems.forEach(otherItem => {
+                        if(otherItem !== item){
+                            otherItem.querySelector('.accordion-content').style.maxHeight = '0px';
+                            otherItem.querySelector('.accordion-icon').style.transform = 'rotate(0deg)';
+                        }
+                    });
+
+                    // Toggle current
+                    if(isExpanded){
+                        content.style.maxHeight = '0px';
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.style.transform = 'rotate(90deg)';
+                    }
+                });
+            });
+            
+            // Chart.js Tech Stack Chart
+            const ctx = document.getElementById('techStackChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['React (Frontend)', 'FastAPI (Backend)', 'PostgreSQL (DB)', 'Material UI (UI Kit)'],
+                    datasets: [{
+                        label: 'Technology Stack',
+                        data: [40, 30, 20, 10],
+                        backgroundColor: [
+                            'rgba(20, 155, 235, 0.7)',
+                            'rgba(18, 178, 124, 0.7)',
+                            'rgba(100, 120, 200, 0.7)',
+                            'rgba(0, 172, 193, 0.7)'
+                        ],
+                        borderColor: [
+                           'rgba(20, 155, 235, 1)',
+                           'rgba(18, 178, 124, 1)',
+                           'rgba(100, 120, 200, 1)',
+                           'rgba(0, 172, 193, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: false,
+                            text: 'Core Technology Stack'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += context.parsed + '% allocation';
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
